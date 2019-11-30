@@ -187,11 +187,14 @@ void Viewport::imgApplyFromNetwork(QNetworkReply *netReply)
 
 void Viewport::imgOpenFromFile()
 {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open"), fileDirLastOpened, tr("IMG Files (*.png *.gif *.jpg *.bmp)"));
-	if (!filename.isEmpty())
+	QStringList filenameList = QFileDialog::getOpenFileNames(this, tr("Open"), fileDirLastOpened, tr("IMG Files (*.png *.gif *.jpg *.bmp)"));
+	if (!filenameList.isEmpty())
 	{
-		imgApply(QPixmap(filename));
-		fileDirLastOpened = filename;
+		for (auto& filename : filenameList)
+		{
+			imgApply(QPixmap(filename));
+			fileDirLastOpened = filename;
+		}
 	}
 }
 
