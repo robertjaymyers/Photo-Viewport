@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/PhotoViewport">
+        <file>Icon/photo-viewport-icon.ico</file>
+    </qresource>
+</RCC>
