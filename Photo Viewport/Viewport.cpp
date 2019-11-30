@@ -3,6 +3,33 @@
 Viewport::Viewport(QWidget* parent)
 	: QGraphicsView(parent)
 {
+	// We account for if user is trying to open a file via the context menu / 
+	// double-clicking, without this program open.
+	// We do some basic checks, like making sure it's a supported image file, to avoid nonsense being loaded.
+	// Currently, we are not checking for multiple instances of the program running, so
+	// double-clicking images in this way over and over will create multiple instances of the program.
+	// It's probably better to leave multiple instances programming alone, to allow the user to have
+	// multiple instances with multiple different slideshows if they so desire.
+	if (QApplication::arguments().size() > 1)
+	{
+		const QString filename = QApplication::arguments().at(1);
+		if (!filename.isEmpty())
+		{
+			QString urlExtension = extensionOf(filename);
+			if (urlExtension == ".jpg" ||
+				urlExtension == ".png" ||
+				urlExtension == ".bmp" ||
+				urlExtension == ".gif")
+			{
+				if (QFile::exists(filename))
+				{
+					imgApply(QPixmap(filename));
+					fileDirLastOpened = filename;
+				}
+			}
+		}
+	}
+
 	// Viewport and dependents' attributes (scene, item) are set on init inside viewport
 	// to minimize need for access from main window class.
 	setAcceptDrops(true);
