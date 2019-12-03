@@ -56,10 +56,15 @@ Viewport::Viewport(QWidget* parent)
 	// so that the order of images stays the same and display focus is placed on the new image when it's loaded.
 	connect(shortcutSlideLeft.get(), &QShortcut::activated, this, &Viewport::slideLeft);
 	connect(shortcutSlideRight.get(), &QShortcut::activated, this, &Viewport::slideRight);
+	connect(shortcutSlideLeft_Alt.get(), &QShortcut::activated, this, &Viewport::slideLeft);
+	connect(shortcutSlideRight_Alt.get(), &QShortcut::activated, this, &Viewport::slideRight);
 
 	connect(shortcutZoomIn.get(), &QShortcut::activated, this, &Viewport::zoomIn);
 	connect(shortcutZoomOut.get(), &QShortcut::activated, this, &Viewport::zoomOut);
 	connect(shortcutZoomReset.get(), &QShortcut::activated, this, &Viewport::zoomReset);
+	connect(shortcutZoomIn_Alt.get(), &QShortcut::activated, this, &Viewport::zoomIn);
+	connect(shortcutZoomOut_Alt.get(), &QShortcut::activated, this, &Viewport::zoomOut);
+	connect(shortcutZoomReset_Alt.get(), &QShortcut::activated, this, &Viewport::zoomReset);
 
 	connect(&netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(imgApplyFromNetwork(QNetworkReply*)));
 

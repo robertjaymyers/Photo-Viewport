@@ -50,9 +50,14 @@ private:
 	std::unique_ptr<QGraphicsPixmapItem> pixmapItem = std::make_unique<QGraphicsPixmapItem>();
 	std::unique_ptr<QShortcut> shortcutSlideLeft = std::make_unique<QShortcut>(QKeySequence(tr("A", "Slide Left")), this);
 	std::unique_ptr<QShortcut> shortcutSlideRight = std::make_unique<QShortcut>(QKeySequence(tr("D", "Slide Right")), this);
+	std::unique_ptr<QShortcut> shortcutSlideLeft_Alt = std::make_unique<QShortcut>(QKeySequence(tr("Left", "Slide Left (Alt)")), this);
+	std::unique_ptr<QShortcut> shortcutSlideRight_Alt = std::make_unique<QShortcut>(QKeySequence(tr("Right", "Slide Right (Alt)")), this);
 	std::unique_ptr<QShortcut> shortcutZoomIn = std::make_unique<QShortcut>(QKeySequence(tr("W", "Zoom In")), this);
 	std::unique_ptr<QShortcut> shortcutZoomOut = std::make_unique<QShortcut>(QKeySequence(tr("S", "Zoom Out")), this);
 	std::unique_ptr<QShortcut> shortcutZoomReset = std::make_unique<QShortcut>(QKeySequence(tr("R", "Zoom Reset")), this);
+	std::unique_ptr<QShortcut> shortcutZoomIn_Alt = std::make_unique<QShortcut>(QKeySequence(tr("Up", "Zoom In")), this);
+	std::unique_ptr<QShortcut> shortcutZoomOut_Alt = std::make_unique<QShortcut>(QKeySequence(tr("Down", "Zoom Out")), this);
+	std::unique_ptr<QShortcut> shortcutZoomReset_Alt = std::make_unique<QShortcut>(QKeySequence(Qt::Key_0), this);
 	const double factorZoomIn = 1.25;
 	const double factorZoomOut = 1 / factorZoomIn;
 	QNetworkAccessManager netManager;
