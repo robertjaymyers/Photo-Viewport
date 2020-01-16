@@ -26,4 +26,6 @@ PhotoViewport::PhotoViewport(QWidget *parent)
 	ui.centralWidget->setLayout(gridLayout.get());
 	gridLayout.get()->addWidget(viewport.get());
 	viewport.get()->show();
+
+	setWindowState(Qt::WindowMaximized);
 }
