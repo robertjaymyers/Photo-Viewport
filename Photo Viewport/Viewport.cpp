@@ -46,6 +46,7 @@ Viewport::Viewport(QWidget* parent)
 
 	// Viewport and dependents' attributes (scene, item) are set on init inside viewport
 	// to minimize need for access from main window class.
+	setDragMode(QGraphicsView::ScrollHandDrag);
 	setAcceptDrops(true);
 	this->setStyleSheet("QGraphicsView{border: 0px; background-color: #000000;}");
 	this->setMinimumSize(QSize(this->width(), this->height() - 20));
@@ -181,17 +182,22 @@ void Viewport::slideRight()
 
 void Viewport::zoomIn()
 {
-	this->scale(factorZoomIn, factorZoomIn);
+	QPixmap temp = pixmapList[pixmapListIndexCurrent].scaled(pixmapItem.get()->pixmap().size() * factorZoomIn, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	pixmapItem.get()->setPixmap(temp);
+	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 }
 
 void Viewport::zoomOut()
 {
-	this->scale(factorZoomOut, factorZoomOut);
+	QPixmap temp = pixmapList[pixmapListIndexCurrent].scaled(pixmapItem.get()->pixmap().size() * factorZoomOut, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	pixmapItem.get()->setPixmap(temp);
+	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 }
 
 void Viewport::zoomReset()
 {
-	this->resetTransform();
+	pixmapItem.get()->setPixmap(pixmapList[pixmapListIndexCurrent]);
+	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 }
 
 QString Viewport::extensionOf(const QString str)
@@ -213,7 +219,6 @@ void Viewport::imgApply(const QPixmap &pixmap)
 	// (e.g. the exception is operations that only apply to a specific image loading scenario,
 	// such as in reading data from network request.)
 	pixmapItem.get()->setPixmap(pixmap);
-	zoomReset();
 	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 	pixmapList.push_back(pixmap);
 	pixmapListIndexCurrent = pixmapList.size() - 1;
