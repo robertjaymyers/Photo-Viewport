@@ -180,11 +180,25 @@ void Viewport::slideRight()
 	}
 }
 
+void Viewport::zoomAdjustScrollPos(const double factorZoom)
+{
+	auto adjustScroll = [=](QScrollBar *scrollBar) {
+		scrollBar->setValue(int(
+			factorZoom * scrollBar->value() +
+			((factorZoom - 1) * scrollBar->pageStep() / 2)
+		));
+	};
+
+	adjustScroll(this->horizontalScrollBar());
+	adjustScroll(this->verticalScrollBar());
+}
+
 void Viewport::zoomIn()
 {
 	QPixmap temp = pixmapList[pixmapListIndexCurrent].scaled(pixmapItem.get()->pixmap().size() * factorZoomIn, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	pixmapItem.get()->setPixmap(temp);
 	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
+	zoomAdjustScrollPos(factorZoomIn);
 }
 
 void Viewport::zoomOut()
@@ -192,6 +206,7 @@ void Viewport::zoomOut()
 	QPixmap temp = pixmapList[pixmapListIndexCurrent].scaled(pixmapItem.get()->pixmap().size() * factorZoomOut, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	pixmapItem.get()->setPixmap(temp);
 	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
+	zoomAdjustScrollPos(factorZoomOut);
 }
 
 void Viewport::zoomReset()

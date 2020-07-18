@@ -35,6 +35,7 @@ This file is part of Photo Viewport.
 #include <QMenu>
 #include <QFileDialog>
 #include <QClipboard>
+#include <QScrollBar>
 
 class Viewport : public QGraphicsView
 {
@@ -77,6 +78,7 @@ private:
 	QNetworkAccessManager netManager;
 	void slideLeft();
 	void slideRight();
+	void zoomAdjustScrollPos(const double factorZoom);
 	void zoomIn();
 	void zoomOut();
 	void zoomReset();
