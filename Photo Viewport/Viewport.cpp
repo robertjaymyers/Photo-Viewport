@@ -60,9 +60,15 @@ Viewport::Viewport(QWidget* parent)
 	actionPasteFromClipboard.get()->setText("Paste Image");
 	actionImageSave.get()->setObjectName("actionImageSave");
 	actionImageSave.get()->setText("Save Current Image");
+	actionToggleAdjustToLastZoomLevel.get()->setObjectName("actionToggleAdjustToLastZoomLevel");
+	actionToggleAdjustToLastZoomLevel.get()->setText("Maintain Zoom Level on Slide");
+	actionToggleAdjustToLastZoomLevel.get()->setCheckable(true);
+	actionToggleAdjustToLastZoomLevel.get()->setChecked(true);
 	contextMenu.get()->addAction(actionFileOpen.get());
 	contextMenu.get()->addAction(actionPasteFromClipboard.get());
 	contextMenu.get()->addAction(actionImageSave.get());
+	contextMenu.get()->addSeparator();
+	contextMenu.get()->addAction(actionToggleAdjustToLastZoomLevel.get());
 
 	// We allow the user to move left or right in the list of loaded images (stored as QPixmap variables and
 	// applied, in turn, to a single QGraphicsPixmapItem, swapping out its current QPixmap as we move),
@@ -74,12 +80,28 @@ Viewport::Viewport(QWidget* parent)
 	connect(shortcutSlideLeft_Alt.get(), &QShortcut::activated, this, &Viewport::slideLeft);
 	connect(shortcutSlideRight_Alt.get(), &QShortcut::activated, this, &Viewport::slideRight);
 
-	connect(shortcutZoomIn.get(), &QShortcut::activated, this, &Viewport::zoomIn);
-	connect(shortcutZoomOut.get(), &QShortcut::activated, this, &Viewport::zoomOut);
+	connect(shortcutZoomIn.get(), &QShortcut::activated, this, [=]() {
+		zoomIn();
+		emit userIncreasedZoomLevel();
+	});
+	connect(shortcutZoomOut.get(), &QShortcut::activated, this, [=]() {
+		zoomOut();
+		emit userDecreasedZoomLevel();
+	});
 	connect(shortcutZoomReset.get(), &QShortcut::activated, this, &Viewport::zoomReset);
-	connect(shortcutZoomIn_Alt.get(), &QShortcut::activated, this, &Viewport::zoomIn);
-	connect(shortcutZoomOut_Alt.get(), &QShortcut::activated, this, &Viewport::zoomOut);
+
+	connect(shortcutZoomIn_Alt.get(), &QShortcut::activated, this, [=]() {
+		zoomIn();
+		emit userIncreasedZoomLevel();
+	});
+	connect(shortcutZoomOut_Alt.get(), &QShortcut::activated, this, [=]() {
+		zoomOut();
+		emit userDecreasedZoomLevel();
+	});
 	connect(shortcutZoomReset_Alt.get(), &QShortcut::activated, this, &Viewport::zoomReset);
+
+	connect(this, &Viewport::userIncreasedZoomLevel, this, [=]() { lastZoomLevel++; });
+	connect(this, &Viewport::userDecreasedZoomLevel, this, [=]() { lastZoomLevel--; });
 
 	connect(&netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(imgApplyFromNetwork(QNetworkReply*)));
 
@@ -160,6 +182,16 @@ void Viewport::contextMenuEvent(QContextMenuEvent *event)
 
 // private
 
+void Viewport::adjustToLastZoomLevel(const int &zoomLevel)
+{
+	if (zoomLevel > 0)
+		for (int i = 0; i < zoomLevel; i++)
+			zoomIn();
+	else if (zoomLevel < 0)
+		for (int i = 0; i < abs(zoomLevel); i++)
+			zoomOut();
+}
+
 void Viewport::slideLeft()
 {
 	if (pixmapListIndexCurrent - 1 >= 0)
@@ -167,6 +199,9 @@ void Viewport::slideLeft()
 		pixmapItem.get()->setPixmap(pixmapList[pixmapListIndexCurrent - 1]);
 		graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 		pixmapListIndexCurrent--;
+
+		if (actionToggleAdjustToLastZoomLevel.get()->isChecked())
+			adjustToLastZoomLevel(lastZoomLevel);
 	}
 }
 
@@ -177,6 +212,9 @@ void Viewport::slideRight()
 		pixmapItem.get()->setPixmap(pixmapList[pixmapListIndexCurrent + 1]);
 		graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
 		pixmapListIndexCurrent++;
+
+		if (actionToggleAdjustToLastZoomLevel.get()->isChecked())
+			adjustToLastZoomLevel(lastZoomLevel);
 	}
 }
 
@@ -213,6 +251,7 @@ void Viewport::zoomReset()
 {
 	pixmapItem.get()->setPixmap(pixmapList[pixmapListIndexCurrent]);
 	graphicsScene.get()->setSceneRect(pixmapItem.get()->boundingRect());
+	lastZoomLevel = 0;
 }
 
 QString Viewport::extensionOf(const QString str)

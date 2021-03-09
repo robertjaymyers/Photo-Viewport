@@ -59,6 +59,7 @@ private:
 	std::unique_ptr<QAction> actionFileOpen = std::make_unique<QAction>();
 	std::unique_ptr<QAction> actionPasteFromClipboard = std::make_unique<QAction>();
 	std::unique_ptr<QAction> actionImageSave = std::make_unique<QAction>();
+	std::unique_ptr<QAction> actionToggleAdjustToLastZoomLevel = std::make_unique<QAction>();
 	std::vector<QPixmap> pixmapList;
 	int pixmapListIndexCurrent = 0;
 	std::unique_ptr<QGraphicsScene> graphicsScene = std::make_unique<QGraphicsScene>();
@@ -75,15 +76,21 @@ private:
 	std::unique_ptr<QShortcut> shortcutZoomReset_Alt = std::make_unique<QShortcut>(QKeySequence(Qt::Key_0), this);
 	const double factorZoomIn = 1.25;
 	const double factorZoomOut = 1 / factorZoomIn;
+	int lastZoomLevel = 0;
 	QNetworkAccessManager netManager;
 	void slideLeft();
 	void slideRight();
+	void adjustToLastZoomLevel(const int &zoomLevel);
 	void zoomAdjustScrollPos(const double factorZoom);
 	void zoomIn();
 	void zoomOut();
 	void zoomReset();
 	QString extensionOf(const QString str);
 	void imgApply(const QPixmap &pixmap);
+
+signals:
+	void userIncreasedZoomLevel();
+	void userDecreasedZoomLevel();
 
 private slots:
 	void imgApplyFromNetwork(QNetworkReply *netReply);
